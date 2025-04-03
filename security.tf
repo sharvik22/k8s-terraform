@@ -7,7 +7,7 @@ resource "yandex_vpc_security_group" "k8s_security_group" {
   ingress {
     protocol       = "ANY"
     description    = "Full internal cluster communication"
-    v4_cidr_blocks = ["192.168.10.0/24"]  # Весь диапазон подсети
+    v4_cidr_blocks = ["192.168.10.0/24"] # Весь диапазон подсети
     from_port      = 0
     to_port        = 65535
   }

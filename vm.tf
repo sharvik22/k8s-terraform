@@ -24,7 +24,7 @@ resource "yandex_compute_instance" "k8s_master" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("/root/.ssh/id_ed25519.pub")}"
+    ssh-keys  = "ubuntu:${file("/root/.ssh/id_ed25519.pub")}"
     user-data = <<-EOF
       #cloud-config
       timezone: Europe/Moscow
@@ -72,7 +72,7 @@ resource "yandex_compute_instance" "k8s_worker" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("/root/.ssh/id_ed25519.pub")}"
+    ssh-keys  = "ubuntu:${file("/root/.ssh/id_ed25519.pub")}"
     user-data = <<-EOF
       #cloud-config
       timezone: Europe/Moscow

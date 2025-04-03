@@ -1,7 +1,7 @@
 # Токен для доступа к Yandex Cloud
 variable "yc_token" {
   type      = string
-  sensitive = true  # Помечаем как чувствительную переменную
+  sensitive = true # Помечаем как чувствительную переменную
 }
 
 # ID облака
@@ -27,20 +27,20 @@ variable "default_zone" {
 
 # Имя VPC
 variable "VPC_name" {
-  type        = string
-  default     = "my-vpc"
+  type    = string
+  default = "my-vpc"
 }
 
 # Базовое имя для публичных подсетей
 variable "public_subnet_name" {
-  type        = string
-  default     = "public"
+  type    = string
+  default = "public"
 }
 
 # CIDR-блок для публичных подсетей
 variable "public_v4_cidr_blocks" {
-  type        = list(string)
-  default     = ["192.168.10.0/24"]
+  type    = list(string)
+  default = ["192.168.10.0/24"]
 }
 
 # Список зон доступности для публичных подсетей
