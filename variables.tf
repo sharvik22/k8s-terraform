@@ -1,7 +1,14 @@
 # Токен для доступа к Yandex Cloud
 variable "yc_token" {
   type      = string
-  sensitive = true # Помечаем как чувствительную переменную
+  sensitive = true
+}
+
+# Публичный SSH-ключ для доступа к ВМ
+variable "ssh_public_key" {
+  type        = string
+  sensitive   = true
+  description = "SSH public key for VM access (format: 'ssh-ed25519 AAA...')"
 }
 
 # ID облака

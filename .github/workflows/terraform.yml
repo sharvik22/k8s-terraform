@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
 
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -25,12 +29,12 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: ${{ env.TF_VERSION }}
+        terraform_wrapper: false
 
     - name: Create SA key file for Terraform
       run: |
         echo "${{ secrets.YC_SA_KEY }}" | base64 --decode > authorized_key.json
         chmod 600 authorized_key.json
-        ls -la  # Для проверки создания файла
       env:
         YC_SA_KEY: ${{ secrets.YC_SA_KEY }}
 
@@ -41,25 +45,45 @@ jobs:
         mkdir -p ~/.config/yandex-cloud
         echo "$YC_SERVICE_ACCOUNT_KEY" > ~/.config/yandex-cloud/sa_key.json
         chmod 600 ~/.config/yandex-cloud/sa_key.json
-        echo "export YC_TOKEN=$(yc iam create-token)" >> $GITHUB_ENV
+        echo "YC_TOKEN=$(yc iam create-token)" >> $GITHUB_ENV
 
     - name: Terraform Init
+      env:
+        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        TF_VAR_yc_token: ${{ secrets.YC_TOKEN }}
+        TF_VAR_cloud_id: ${{ env.YC_CLOUD_ID }}
+        TF_VAR_folder_id: ${{ env.YC_FOLDER_ID }}
       run: terraform init
 
     - name: Terraform Format Check
-      run: terraform fmt -check
+      run: terraform fmt -check -recursive -diff
 
     - name: Terraform Validate
+      env:
+        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        TF_VAR_yc_token: ${{ secrets.YC_TOKEN }}
       run: terraform validate
 
     - name: Terraform Plan
       if: github.event_name == 'pull_request'
+      env:
+        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        TF_VAR_yc_token: ${{ secrets.YC_TOKEN }}
+        TF_VAR_cloud_id: ${{ env.YC_CLOUD_ID }}
+        TF_VAR_folder_id: ${{ env.YC_FOLDER_ID }}
       run: terraform plan -input=false -no-color
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
+      env:
+        TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+        TF_VAR_yc_token: ${{ secrets.YC_TOKEN }}
+        TF_VAR_cloud_id: ${{ env.YC_CLOUD_ID }}
+        TF_VAR_folder_id: ${{ env.YC_FOLDER_ID }}
+      run: terraform apply -auto-approve -input=false -no-color
 
-    - name: Cleanup SA key file
+    - name: Cleanup
       if: always()
-      run: rm -f authorized_key.json
+      run: |
+        rm -f authorized_key.json
+        rm -f ~/.config/yandex-cloud/sa_key.json
