@@ -1,3 +1,4 @@
+#############################
 # Создание VPC
 resource "yandex_vpc_network" "my_vpc" {
   name = var.VPC_name
