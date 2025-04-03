@@ -1,3 +1,4 @@
+# Основные переменные для провайдера
 variable "yc_token" {
   type        = string
   sensitive   = true
@@ -6,25 +7,23 @@ variable "yc_token" {
 
 variable "cloud_id" {
   type        = string
-  default     = "b1g811k1u7vur9c50o56"
   description = "Yandex Cloud ID"
 }
 
 variable "folder_id" {
   type        = string
-  default     = "b1guevbvpqmirfgfolig"
   description = "Yandex Cloud Folder ID"
 }
 
 variable "default_zone" {
   type        = string
-  default     = "ru-central1-a"
   description = "Default availability zone"
 }
 
+# Переменные для VPC
 variable "VPC_name" {
   type        = string
-  default     = "my-vpc"
+  default     = "k8s-vpc"
   description = "VPC network name"
 }
 
@@ -46,8 +45,9 @@ variable "public_subnet_zones" {
   description = "Availability zones for public subnets"
 }
 
+# SSH ключ
 variable "ssh_public_key" {
   type        = string
-  description = "SSH public key for VM access"
   sensitive   = true
+  description = "SSH public key for VM access"
 }
