@@ -3,7 +3,7 @@
 resource "yandex_compute_instance" "k8s_master" {
   name        = "k8s-master"
   platform_id = "standard-v2"
-  zone        = var.public_subnet_zones[0]  # Используем первую зону из списка
+  zone        = var.public_subnet_zones[0] # Используем первую зону из списка
 
   resources {
     cores         = 2
@@ -19,7 +19,7 @@ resource "yandex_compute_instance" "k8s_master" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.public_subnet[0].id  # Подсеть из той же зоны
+    subnet_id          = yandex_vpc_subnet.public_subnet[0].id # Подсеть из той же зоны
     nat                = true
     security_group_ids = [yandex_vpc_security_group.k8s_security_group.id]
   }
@@ -47,7 +47,7 @@ resource "yandex_compute_instance" "k8s_worker" {
   count       = 2
   name        = "k8s-worker-${count.index + 1}"
   platform_id = "standard-v2"
-  zone        = var.public_subnet_zones[count.index]  # Используем соответствующую зону
+  zone        = var.public_subnet_zones[count.index] # Используем соответствующую зону
 
   resources {
     cores         = 2
@@ -56,7 +56,7 @@ resource "yandex_compute_instance" "k8s_worker" {
   }
 
   scheduling_policy {
-    preemptible = true  # Для всех worker-нод
+    preemptible = true # Для всех worker-нод
   }
 
   boot_disk {
@@ -67,7 +67,7 @@ resource "yandex_compute_instance" "k8s_worker" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.public_subnet[count.index].id  # Подсеть из той же зоны
+    subnet_id          = yandex_vpc_subnet.public_subnet[count.index].id # Подсеть из той же зоны
     nat                = true
     security_group_ids = [yandex_vpc_security_group.k8s_security_group.id]
   }

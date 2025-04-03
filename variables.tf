@@ -112,19 +112,19 @@ variable "worker_nodes" {
 # Настройки балансировщика нагрузки
 variable "load_balancer" {
   type = object({
-    name           = string
-    region_id      = string
-    target_port    = number
-    healthcheck    = object({
+    name        = string
+    region_id   = string
+    target_port = number
+    healthcheck = object({
       path = string
       port = number
     })
   })
   default = {
-    name           = "k8s-load-balancer"
-    region_id      = "ru-central1"
-    target_port    = 80
-    healthcheck    = {
+    name        = "k8s-load-balancer"
+    region_id   = "ru-central1"
+    target_port = 80
+    healthcheck = {
       path = "/healthz"
       port = 80
     }
