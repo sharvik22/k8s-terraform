@@ -9,9 +9,8 @@ terraform {
 }
 
 provider "yandex" {
+  token     = var.yc_token
   cloud_id  = var.cloud_id
   folder_id = var.folder_id
   zone      = var.default_zone
-  #  service_account_key_file = file("~/.authorized_key.json")  # Указание файла ключа сервисного аккаунта
-  service_account_key_file = file("/home/admon/diplom/k8s/authorized_key.json")
 }
