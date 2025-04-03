@@ -1,50 +1,53 @@
-# Токен для доступа к Yandex Cloud
+# Основные переменные для провайдера
 variable "yc_token" {
-  type      = string
-  sensitive = true # Помечаем как чувствительную переменную
+  type        = string
+  sensitive   = true
+  description = "Yandex Cloud OAuth token"
 }
 
-# ID облака
 variable "cloud_id" {
   type        = string
-  default     = "b1g811k1u7vur9c50o56"
-  description = "https://cloud.yandex.ru/docs/resource-manager/operations/cloud/get-id"
+  description = "Yandex Cloud ID"
 }
 
-# ID каталога
 variable "folder_id" {
   type        = string
-  default     = "b1guevbvpqmirfgfolig"
-  description = "https://cloud.yandex.ru/docs/resource-manager/operations/folder/get-id"
+  description = "Yandex Cloud Folder ID"
 }
 
-# Зона по умолчанию
 variable "default_zone" {
   type        = string
-  default     = "ru-central1-a"
-  description = "https://cloud.yandex.ru/docs/overview/concepts/geo-scope"
+  description = "Default availability zone"
 }
 
-# Имя VPC
+# Переменные для VPC
 variable "VPC_name" {
-  type    = string
-  default = "my-vpc"
+  type        = string
+  default     = "k8s-vpc"
+  description = "VPC network name"
 }
 
-# Базовое имя для публичных подсетей
 variable "public_subnet_name" {
-  type    = string
-  default = "public"
+  type        = string
+  default     = "public"
+  description = "Public subnet name prefix"
 }
 
-# CIDR-блок для публичных подсетей
 variable "public_v4_cidr_blocks" {
-  type    = list(string)
-  default = ["192.168.10.0/24"]
+  type        = list(string)
+  default     = ["192.168.10.0/24"]
+  description = "Public subnet CIDR blocks"
 }
 
-# Список зон доступности для публичных подсетей
 variable "public_subnet_zones" {
-  type    = list(string)
-  default = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
+  type        = list(string)
+  default     = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
+  description = "Availability zones for public subnets"
+}
+
+# SSH ключ
+variable "ssh_public_key" {
+  type        = string
+  sensitive   = true
+  description = "SSH public key for VM access"
 }
