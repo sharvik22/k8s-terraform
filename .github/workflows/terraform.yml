@@ -1,0 +1,53 @@
+name: Terraform Yandex Cloud CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  TF_VERSION: 1.5.7
+  YC_FOLDER_ID: "b1guevbvpqmirfgfolig"  # Замените на ваш folder ID
+  YC_CLOUD_ID: "b1g811k1u7vur9c50o56"  # Замените на ваш cloud ID
+
+jobs:
+  terraform:
+    name: Terraform Deployment
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Configure YC CLI
+      env:
+        YC_SERVICE_ACCOUNT_KEY: ${{ secrets.YC_SA_KEY }}
+      run: |
+        mkdir -p ~/.config/yandex-cloud
+        echo "$YC_SERVICE_ACCOUNT_KEY" > ~/.config/yandex-cloud/sa_key.json
+        chmod 600 ~/.config/yandex-cloud/sa_key.json
+        echo "export YC_TOKEN=$(yc iam create-token)" >> $GITHUB_ENV
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Format Check
+      run: terraform fmt -check
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan -input=false -no-color
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false
