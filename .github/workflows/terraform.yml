@@ -1,53 +1,59 @@
-name: Terraform Yandex Cloud CI/CD
+---
+name: Terraform CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: ["main"]
   pull_request:
-    branches: [ main ]
+    branches: ["main"]
 
 env:
-  TF_VERSION: 1.5.7
-  YC_FOLDER_ID: "b1guevbvpqmirfgfolig"  # Замените на ваш folder ID
-  YC_CLOUD_ID: "b1g811k1u7vur9c50o56"  # Замените на ваш cloud ID
+  TF_VERSION: "1.5.7"
+  YC_CLOUD_ID: "b1g811k1u7vur9c50o56"
+  YC_FOLDER_ID: "b1guevbvpqmirfgfolig"
+  YC_ZONE: "ru-central1-a"
 
 jobs:
   terraform:
-    name: Terraform Deployment
-    runs-on: ubuntu-latest
-    environment: production
+    name: "Terraform"
+    runs-on: "ubuntu-latest"
+    environment: "production"
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: "Checkout code"
+        uses: "actions/checkout@v3"
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: ${{ env.TF_VERSION }}
+      - name: "Setup Terraform"
+        uses: "hashicorp/setup-terraform@v2"
+        with:
+          terraform_version: "${{ env.TF_VERSION }}"
 
-    - name: Configure YC CLI
-      env:
-        YC_SERVICE_ACCOUNT_KEY: ${{ secrets.YC_SA_KEY }}
-      run: |
-        mkdir -p ~/.config/yandex-cloud
-        echo "$YC_SERVICE_ACCOUNT_KEY" > ~/.config/yandex-cloud/sa_key.json
-        chmod 600 ~/.config/yandex-cloud/sa_key.json
-        echo "export YC_TOKEN=$(yc iam create-token)" >> $GITHUB_ENV
+      - name: "Terraform Init"
+        env:
+          TF_VAR_yc_token: "${{ secrets.YC_TOKEN }}"
+        run: "terraform init"
 
-    - name: Terraform Init
-      run: terraform init
+      - name: "Terraform Format"
+        run: "terraform fmt -check"
 
-    - name: Terraform Format Check
-      run: terraform fmt -check
+      - name: "Terraform Validate"
+        run: "terraform validate"
 
-    - name: Terraform Validate
-      run: terraform validate
+      - name: "Terraform Plan"
+        env:
+          TF_VAR_yc_token: "${{ secrets.YC_TOKEN }}"
+          TF_VAR_ssh_public_key: "${{ secrets.SSH_PUBLIC_KEY }}"
+          TF_VAR_cloud_id: "${{ env.YC_CLOUD_ID }}"
+          TF_VAR_folder_id: "${{ env.YC_FOLDER_ID }}"
+          TF_VAR_default_zone: "${{ env.YC_ZONE }}"
+        run: "terraform plan -input=false -no-color"
 
-    - name: Terraform Plan
-      if: github.event_name == 'pull_request'
-      run: terraform plan -input=false -no-color
-
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
+      - name: "Terraform Apply"
+        if: "github.ref == 'refs/heads/main' && github.event_name == 'push'"
+        env:
+          TF_VAR_yc_token: "${{ secrets.YC_TOKEN }}"
+          TF_VAR_ssh_public_key: "${{ secrets.SSH_PUBLIC_KEY }}"
+          TF_VAR_cloud_id: "${{ env.YC_CLOUD_ID }}"
+          TF_VAR_folder_id: "${{ env.YC_FOLDER_ID }}"
+          TF_VAR_default_zone: "${{ env.YC_ZONE }}"
+        run: "terraform apply -auto-approve -input=false"

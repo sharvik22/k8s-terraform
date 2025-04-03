@@ -1,4 +1,4 @@
-# Создание виртуальной машины для master-ноды
+#TEST6
 resource "yandex_compute_instance" "k8s_master" {
   name        = "k8s-master"
   platform_id = "standard-v2"
@@ -24,7 +24,7 @@ resource "yandex_compute_instance" "k8s_master" {
   }
 
   metadata = {
-    ssh-keys  = "ubuntu:${file("/root/.ssh/id_ed25519.pub")}"
+    ssh-keys  = "ubuntu:${var.ssh_public_key}"
     user-data = <<-EOF
       #cloud-config
       timezone: Europe/Moscow
@@ -34,14 +34,13 @@ resource "yandex_compute_instance" "k8s_master" {
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh-authorized-keys:
-            - ${file("/root/.ssh/id_ed25519.pub")}
+            - ${var.ssh_public_key}
       EOF
   }
 
   service_account_id = "aje5egcnh4t73raucnli"
 }
 
-# Создание виртуальных машин для worker-нод
 resource "yandex_compute_instance" "k8s_worker" {
   count       = 2
   name        = "k8s-worker-${count.index + 1}"
@@ -72,7 +71,7 @@ resource "yandex_compute_instance" "k8s_worker" {
   }
 
   metadata = {
-    ssh-keys  = "ubuntu:${file("/root/.ssh/id_ed25519.pub")}"
+    ssh-keys  = "ubuntu:${var.ssh_public_key}"
     user-data = <<-EOF
       #cloud-config
       timezone: Europe/Moscow
@@ -82,7 +81,7 @@ resource "yandex_compute_instance" "k8s_worker" {
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh-authorized-keys:
-            - ${file("/root/.ssh/id_ed25519.pub")}
+            - ${var.ssh_public_key}
       EOF
   }
 
