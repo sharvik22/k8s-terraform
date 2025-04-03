@@ -1,3 +1,4 @@
+############################################
 # Создание виртуальной машины для master-ноды
 resource "yandex_compute_instance" "k8s_master" {
   name        = "k8s-master"
