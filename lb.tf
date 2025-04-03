@@ -1,11 +1,10 @@
-# lb.tf
 resource "yandex_lb_target_group" "k8s_nodes" {
   name      = "k8s-nodes-target-group"
-  region_id = "ru-central1" # Важно указать регион, а не зону
+  region_id = "ru-central1"
 
   # Мастер-нода
   target {
-    subnet_id = yandex_vpc_subnet.public_subnet[0].id # ru-central1-a
+    subnet_id = yandex_vpc_subnet.public_subnet[0].id
     address   = yandex_compute_instance.k8s_master.network_interface.0.ip_address
   }
 
