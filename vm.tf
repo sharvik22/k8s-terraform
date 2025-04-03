@@ -47,7 +47,7 @@ resource "yandex_compute_instance" "k8s_worker" {
   count       = 2
   name        = "k8s-worker-${count.index + 1}"
   platform_id = "standard-v2"
-  zone        = var.public_subnet_zones[count.index + 1]
+  zone        = count.index == 1 ? "ru-central1-a" : var.public_subnet_zones[count.index]
 
   resources {
     cores         = 2
@@ -56,7 +56,7 @@ resource "yandex_compute_instance" "k8s_worker" {
   }
 
   scheduling_policy {
-    preemptible = true
+    preemptible = count.index == 1 ? false : true
   }
 
   boot_disk {
