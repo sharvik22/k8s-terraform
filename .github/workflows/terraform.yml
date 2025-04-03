@@ -8,8 +8,8 @@ on:
 
 env:
   TF_VERSION: 1.5.7
-  YC_FOLDER_ID: "b1guevbvpqmirfgfolig"  # Замените на ваш folder ID
-  YC_CLOUD_ID: "b1g811k1u7vur9c50o56"  # Замените на ваш cloud ID
+  YC_FOLDER_ID: "b1guevbvpqmirfgfolig"
+  YC_CLOUD_ID: "b1g811k1u7vur9c50o56"
 
 jobs:
   terraform:
@@ -25,6 +25,14 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Create SA key file for Terraform
+      run: |
+        echo "${{ secrets.YC_SA_KEY }}" | base64 --decode > authorized_key.json
+        chmod 600 authorized_key.json
+        ls -la  # Для проверки создания файла
+      env:
+        YC_SA_KEY: ${{ secrets.YC_SA_KEY }}
 
     - name: Configure YC CLI
       env:
@@ -51,3 +59,7 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
+
+    - name: Cleanup SA key file
+      if: always()
+      run: rm -f authorized_key.json
